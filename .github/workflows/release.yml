@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branch:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: CI
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - run: make build
+      - run: tar -czf build.tar.gz build/*
+
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y_%m_%d_%H_%M_%S')" >> $GITHUB_OUTPUT
+
+      - name: Create or Update release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete latest-release --yes || true
+          gh release create latest-release build.tar.gz \
+              --repo="$GITHUB_REPOSITORY" \
+              --title="${GITHUB_REPOSITORY#*/} latest release" \
+              --notes "Generated on ${{ steps.date.outputs.date }}"
