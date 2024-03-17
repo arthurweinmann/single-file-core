@@ -222,7 +222,7 @@ function getElementsInfo(win, doc, element, options, data = { usedFonts: new Map
 						elementKept = ((ascendantHidden || element.closest("html > head")) && KEPT_TAG_NAMES.includes(element.tagName.toUpperCase())) || element.closest("details");
 						if (!elementKept) {
 							elementHidden = ascendantHidden || testHiddenElement(element, computedStyle);
-							if (elementHidden && !IGNORED_TAG_NAMES.includes(element.tagName.toUpperCase())) {
+							if (elementHidden && (element.tagName === undefined || !IGNORED_TAG_NAMES.includes(element.tagName.toUpperCase()))) {
 								element.setAttribute(HIDDEN_CONTENT_ATTRIBUTE_NAME, "");
 								data.markedElements.push(element);
 							}
